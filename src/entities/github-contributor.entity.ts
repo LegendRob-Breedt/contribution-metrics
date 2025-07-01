@@ -1,19 +1,9 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
-import { User } from './User.js';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { BaseEntity } from './base.entity.js';
+import { User } from './user.entity.js';
 
 @Entity('github_contributors')
-export class GitHubContributor {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
+export class GitHubContributor extends BaseEntity {
   @Column({ type: 'varchar' })
   currentUsername!: string;
 
@@ -38,10 +28,4 @@ export class GitHubContributor {
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'userId' })
   user!: User;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
 }

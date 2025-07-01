@@ -2,6 +2,7 @@ import { loadConfig } from 'zod-config';
 import { z } from 'zod';
 
 const configSchema = z.object({
+  SHOW_ENV_CONFIG: z.coerce.boolean().default(false),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3000),
   HOST: z.string().default('localhost'),

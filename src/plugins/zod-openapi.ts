@@ -1,12 +1,16 @@
 import fp from 'fastify-plugin';
 import type { FastifyInstance } from 'fastify';
 import {
+  fastifyZodOpenApiPlugin,
   fastifyZodOpenApiTransform,
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-zod-openapi';
 
 async function zodPlugin(fastify: FastifyInstance) {
+  // Register the fastify-zod-openapi plugin first
+  await fastify.register(fastifyZodOpenApiPlugin);
+
   await fastify.register(import('@fastify/swagger'), {
     openapi: {
       openapi: '3.0.3',

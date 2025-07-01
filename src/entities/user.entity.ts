@@ -1,12 +1,5 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { BaseEntity } from './base.entity.js';
 
 export enum Role {
   PRODUCT_ENGINEER = 'Product Engineer',
@@ -40,10 +33,7 @@ export enum AppAccessRole {
 }
 
 @Entity('users')
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
+export class User extends BaseEntity {
   @Column({ type: 'varchar', unique: true })
   email!: string;
 
@@ -102,10 +92,4 @@ export class User {
     default: AppAccessRole.IC,
   })
   appAccessRole!: AppAccessRole;
-
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
 }

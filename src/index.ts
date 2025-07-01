@@ -4,7 +4,8 @@ import { config } from './config/index.js';
 import { createAppDataSource } from './database/index.js';
 import zodOpenApiPlugin from './plugins/zod-openapi.js';
 import { initializeTracing, shutdownTracing } from './tracing.js';
-import packackInfo from '../package.json' assert { type: 'json' };
+import { githubOrganizationRoutes, userRoutes, githubContributorRoutes } from './routes/index.js';
+import packackInfo from '../package.json' with { type: 'json' };
 import type { JSONObject } from '@fastify/swagger';
 import type { DataSource } from 'typeorm';
 
@@ -31,8 +32,33 @@ async function startApplication() {
     },
   });
 
+  fastify.log.info(appConfig.SHOW_ENV_CONFIG);
+  if (appConfig.SHOW_ENV_CONFIG)
+    fastify.log.info('Loaded configuration:' + JSON.stringify(appConfig));
+
   // Register plugins
   await fastify.register(zodOpenApiPlugin);
+
+  // Initialize database connection first
+  let appDataSource: DataSource | undefined;
+  try {
+    appDataSource = await createAppDataSource();
+    fastify.log.info('Database connection initializing...');
+    await appDataSource.initialize();
+    if (appDataSource.isInitialized) {
+      fastify.log.info('Database connection established');
+    }
+  } catch (error) {
+    fastify.log.error('Database connection failed:');
+    fastify.log.error(error);
+    fastify.log.info('Routes will run with mock data');
+    // Don't exit the process - let the server run without database for now
+  }
+
+  // Register API routes with dataSource
+  await fastify.register(githubOrganizationRoutes, { dataSource: appDataSource });
+  await fastify.register(userRoutes);
+  await fastify.register(githubContributorRoutes);
 
   // Health check endpoint
   fastify.get('/health', async () => {
@@ -42,22 +68,6 @@ async function startApplication() {
       version: appConfig.OTEL_SERVICE_VERSION,
     } as JSONObject;
   });
-
-  // Initialize database connection asynchronously (non-blocking)
-  let AppDataSource: DataSource;
-  const initializeDatabase = async () => {
-    try {
-      AppDataSource = await createAppDataSource();
-      await AppDataSource.initialize();
-      fastify.log.info('Database connection established');
-    } catch (error) {
-      fastify.log.error('Database connection failed:', error);
-      // Don't exit the process - let the server run without database for now
-    }
-  };
-
-  // Start database initialization but don't wait for it
-  initializeDatabase();
 
   // Start server
   try {
@@ -78,8 +88,8 @@ async function startApplication() {
   process.on('SIGINT', async () => {
     fastify.log.info('Received SIGINT, shutting down gracefully');
     await fastify.close();
-    if (AppDataSource) {
-      await AppDataSource.destroy();
+    if (appDataSource) {
+      await appDataSource.destroy();
     }
     await shutdownTracing(sdk);
     process.exit(0);
@@ -88,8 +98,8 @@ async function startApplication() {
   process.on('SIGTERM', async () => {
     fastify.log.info('Received SIGTERM, shutting down gracefully');
     await fastify.close();
-    if (AppDataSource) {
-      await AppDataSource.destroy();
+    if (appDataSource) {
+      await appDataSource.destroy();
     }
     await shutdownTracing(sdk);
     process.exit(0);

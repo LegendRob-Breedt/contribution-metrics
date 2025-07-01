@@ -25,6 +25,7 @@ coverage/
 *.db
 *.sqlite
 *.sqlite3
+.dbdata/
 
 # OS generated files
 .DS_Store

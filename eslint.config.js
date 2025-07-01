@@ -103,6 +103,7 @@ export default [
       'node_modules/',
       'coverage/',
       'src/test/**/*', // Exclude test files from project parsing
+      'vitest.config.ts',
     ],
   },
 ]

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { config } from '../config/index.js';
-import { GitHubOrganization, User, GitHubContributor } from '../entities/index.js';
+import { GitHubOrganization, User, GitHubContributor } from '../entities/index';
 
 let dataSource: DataSource | null = null;
 

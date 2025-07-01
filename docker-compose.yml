@@ -10,13 +10,13 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 30s
       timeout: 10s
       retries: 3
+    volumes:
+      - .dbdata:/var/lib/postgresql/data
 
   redis:
     image: redis:7-alpine
@@ -48,7 +48,7 @@ services:
       - "--collector.otlp.http.host-port=0.0.0.0:4318"
 
   adminer:
-    image: adminer:4.8.1
+    image: adminer:5.3.0
     container_name: contribution-metrics-adminer
     ports:
       - "8080:8080"
