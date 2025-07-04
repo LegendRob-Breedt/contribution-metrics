@@ -9,7 +9,8 @@ import {
   type UpdateGitHubOrganizationRequest,
 } from '../schemas/github-organization.js';
 import { GitHubOrganizationService } from '../services/github-organization.service.js';
-import { GitHubOrganization, isValidUUID } from '../entities/index.js';
+import { isValidUUID } from '../shared/entities/index.js';
+import { GitHubOrganization as GitHubOrganizationEntity } from '../shared/entities/github-organization.entity.js';
 
 export async function githubOrganizationRoutes(
   fastify: FastifyInstance,
@@ -20,7 +21,7 @@ export async function githubOrganizationRoutes(
   // Create service instance if dataSource is available
   let service: GitHubOrganizationService | null = null;
   if (options.dataSource?.isInitialized) {
-    const repository = options.dataSource.getRepository(GitHubOrganization);
+    const repository = options.dataSource.getRepository(GitHubOrganizationEntity);
     service = new GitHubOrganizationService(repository);
   }
 

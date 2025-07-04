@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import Fastify from 'fastify';
-import { githubOrganizationRoutes } from '../../routes/github-organizations.js';
-import zodOpenApiPlugin from '../../plugins/zod-openapi.js';
+import { githubOrganizationRoutes } from '../../modules/github-organization/routes/github-organization.routes.js';
+import zodOpenApiPlugin from '../../shared/plugins/zod-openapi.js';
+import { createContainer } from 'awilix';
 
 describe('GitHub Organizations Routes - Service Unavailable', () => {
   it('should return 503 when database service is not available', async () => {
@@ -10,8 +11,11 @@ describe('GitHub Organizations Routes - Service Unavailable', () => {
     // Register plugins
     await app.register(zodOpenApiPlugin);
     
-    // Register routes without dataSource (service unavailable)
-    await app.register(githubOrganizationRoutes, { dataSource: undefined });
+    // Create container without services (service unavailable)
+    const container = createContainer();
+    
+    // Register routes without proper container setup
+    await app.register(githubOrganizationRoutes, { container });
 
     const response = await app.inject({
       method: 'GET',
@@ -21,8 +25,8 @@ describe('GitHub Organizations Routes - Service Unavailable', () => {
     expect(response.statusCode).toBe(503);
     const body = JSON.parse(response.body);
     expect(body).toMatchObject({
-      error: 'Service Unavailable',
-      message: 'Database service is not available',
+      error: 'ServiceUnavailable',
+      message: 'Service is not available',
     });
 
     await app.close();
@@ -34,8 +38,11 @@ describe('GitHub Organizations Routes - Service Unavailable', () => {
     // Register plugins
     await app.register(zodOpenApiPlugin);
     
-    // Register routes without dataSource (service unavailable)
-    await app.register(githubOrganizationRoutes, { dataSource: undefined });
+    // Create container without services (service unavailable)
+    const container = createContainer();
+    
+    // Register routes without proper container setup
+    await app.register(githubOrganizationRoutes, { container });
 
     const response = await app.inject({
       method: 'POST',
@@ -50,8 +57,8 @@ describe('GitHub Organizations Routes - Service Unavailable', () => {
     expect(response.statusCode).toBe(503);
     const body = JSON.parse(response.body);
     expect(body).toMatchObject({
-      error: 'Service Unavailable',
-      message: 'Database service is not available',
+      error: 'ServiceUnavailable',
+      message: 'Service is not available',
     });
 
     await app.close();

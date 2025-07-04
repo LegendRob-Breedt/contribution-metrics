@@ -1,4 +1,7 @@
-<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
+---
+applyTo: '**'
+---
+Coding standards, domain knowledge, and preferences that AI should follow.
 
 # Contribution Metrics Service - Copilot Instructions
 
@@ -7,7 +10,7 @@ This service is built with the following technology stack and should follow thes
 ## Technology Stack
 - **Runtime**: Node.js 22
 - **Language**: TypeScript targeting ES2022
-- **Package Manager**: PNPM
+- **Package Manager**: NPM
 - **Web Framework**: Fastify 5.x
 - **API Documentation**: OpenAPI v3 with @fastify/swagger and @fastify/swagger-ui
 - **Schema Management**: fastify-zod-openapi 4.x (registered as Fastify plugin)
@@ -19,9 +22,67 @@ This service is built with the following technology stack and should follow thes
 - **Environment Configuration**: zod-config 1.x
 - **Tracing**: OpenTelemetry with @opentelemetry/auto-instrumentations-node
 - **Logging**: Pino 9.x with @opentelemetry/instrumentation-pino integration
+- **Metrics**: Use of OpenTelemetry for metrics collection and integratesion with Prometheus
+- **Dependency Injection**: Awilix for service management
 - **Local Development**: Docker Compose
 
 ## Code Patterns
+The project follows a hexagonal domain-driven design (DDD) approach with a focus on modularity and separation of concerns.
+Each core domain should have its own modules directory structure.
+
+## File Organization
+```
+src/modules/[coredomain]/
+├── domains/          # Domain entities used by services and act as data transfer objects (DTOs) between routing and ports. File names should be named as `domain-name.domain.ts`. Class name should be 'DomainName'
+├── ports/            # Interfaces for business logic services or external APIs/reposititories. File names should be named as `name.[service|repository|api]).ports.ts`. Interface name should be `NameService` or `NameRepository` or `NameApi`.
+├── application/      # Business logic services implementing interfaces. File names should be named as `name.service.ts`. Class name should be `NameServiceImpl`.
+├── schemas/          # Zod schemas for validation
+├── routes/           # Fastify route handlers
+
+src/adaptors/db/[coredomain]/
+├── repositories/    # TypeORM repositories for database access - Implements the repository interfaces defined in ports
+├── entities/        # TypeORM entities - Maps to the domain objects defined in domains
+src/adaptors/api/[coredomain]/
+├── rest/            # External Rest API adapters (e.g., GitHub API) - Implements the API interfaces defined in ports
+├── graphql/         # External GraphQL API adapters (if applicable) - Implements the API interfaces defined in ports
+
+src/shared/
+├── container/        # Dependency injection container setup
+├── logger/           # Logging setup
+├── instrumentation/  # OpenTelemetry Instrumentation configuration
+├── database/         # TypeORM data source and migrations
+└── config/           # Configuration management
+├── errors/           # Common errors
+├── plugins/          # Fastify plugins
+├── utils/            # Utility functions
+└── tests/            # Test utilities and setup
+
+Tests should be placed in the `tests` directory, mimicking the structure of the `src` directory.
+```
+
+## Development Guidelines
+- Use TypeScript with strict mode enabled
+- Follow the hexagonal architecture principles
+- Use domain-driven design (DDD) principles
+- Use index.ts files to re-export modules for cleaner imports
+- Use descriptive names for files, classes, and methods
+- Use functional programming patterns where applicable
+- Use @modules to import modules from the `src/modules` directory
+- Use @shared to import shared utilities, configurations, and services from the `src/shared`
+- Use @adaptors to import adaptors from the `src/adaptors` directory
+
+When implementing features:
+1. Create domain objects
+2. Implement port interfaces for business logic or external APIs or repositories
+3. Define Zod schemas for validation of requests and responses
+4. Implement route handlers with OpenAPI documentation
+5. Create or update TypeORM entities
+6. Implement TypeORM repositories and entities for database access
+7. Implement API adapters for external services
+8. Write comprehensive tests
+
+Always prioritize type safety, error handling, and maintainability.
+
 
 ### Error Handling
 - Always use neverthrow's `Result<T, E>` type for operations that can fail
@@ -41,18 +102,26 @@ This service is built with the following technology stack and should follow thes
 - Return Result types from service methods
 - Handle database errors gracefully
 - Use transactions for multi-step operations
+- Use migration files for initial data seeding.
+- Use migration files for schema changes once project is stable (above 1.0.0)
 
 ### Service Architecture
-The service manages:
+Each service should:
+- Be responsible for a specific domain (e.g., GitHub organizations, users)
+- Service methods should return `Result<T, E>` types
+- Services method naming should be descriptive (e.g., `createOrganization`, `getUserById`)
+- Services should not directly handle HTTP requests; they should be called from route handlers
+- The service should handle business logic and data access.
+- Use interfaces to define service contracts
+- Implement concrete classes that adhere to the interfaces
+- Use dependency injection to provide service instances with Awilix using Classic mode.
+- Transformation logic from API controller should be encapsulated within the controller layer.
+- Can you create domain objects that represent the core business entities and map them to TypeORM entities in the service layer.
 
-1. **GitHub Organizations**: Store access tokens and expiration timestamps
-2. **Users**: Employee/contributor information with roles, teams, and hierarchy
-3. **GitHub Contributors**: Link GitHub identities to internal users
-
-### Database Schema
-- `github_organizations`: GitHub org tokens and metadata
-- `users`: Internal user/employee data with roles and team structure
-- `github_contributors`: GitHub identity information linked to users
+When a service integrates with external APIs (like GitHub) or OAuth, it should:
+- Use a interface to define the expected behavior
+- Implement the interface with concrete adapter classes that handle the API calls.
+- Provide a development adapter for local testing without external dependencies.
 
 ### Environment Configuration
 - Use zod-config 1.x for type-safe environment variables
@@ -64,6 +133,14 @@ The service manages:
 - Use structured logging with Pino 9.x
 - Include correlation IDs in logs
 - Integrate with OpenTelemetry using @opentelemetry/instrumentation-pino
+- Use OpenTelemetry for distributed tracing
+- Use Jaeger for tracing visualization
+- Use OpenTelemetry for metrics collection and integration with Prometheus
+- Use @opentelemetry/sdk-metrics for metrics collection
+- Use @opentelemetry/instrumentation-fastify for Fastify instrumentation
+- Use @opentelemetry/instrumentation-http for HTTP instrumentation
+- Use @opentelemetry/instrumentation-pg for PostgreSQL instrumentation
+- Use @opentelemetry/instrumentation-redis for Redis instrumentation
 - Use @opentelemetry/auto-instrumentations-node for automatic instrumentation
 - Log at appropriate levels (error, warn, info, debug)
 
@@ -73,26 +150,12 @@ The service manages:
 - Use Vitest test runner
 - Mock external dependencies (GitHub API, database)
 - Aim for high test coverage
+- Use pg-mem for in-memory PostgreSQL testing
 
-## File Organization
-```
-src/
-├── config/           # Environment configuration
-├── entities/         # TypeORM entities
-├── schemas/          # Zod schemas for validation
-├── services/         # Business logic services
-├── routes/           # Fastify route handlers
-├── plugins/          # Fastify plugins
-├── utils/            # Utility functions
-├── types/            # TypeScript type definitions
-└── migrations/       # Database migrations
-```
-
-When implementing features:
-1. Define Zod schemas first
-2. Create or update TypeORM entities
-3. Implement service methods with proper error handling
-4. Create route handlers with OpenAPI documentation
-5. Write comprehensive tests
-
-Always prioritize type safety, error handling, and maintainability.
+## Docker Compose
+- Use Docker Compose for local development
+- Define services for the application, database (Postgres), and Jaeger (2.7.0) for tracing
+- Define adminer service for database management
+- Use volumes for persistent data storage
+- Use environment variables for configuration
+- Ensure all services can be started with `docker-compose up`

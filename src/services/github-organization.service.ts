@@ -1,6 +1,6 @@
 import type { Repository } from 'typeorm';
 import { Result, ok, err } from 'neverthrow';
-import { GitHubOrganization } from '../entities/index.js';
+import { GitHubOrganization } from '../shared/entities/github-organization.entity.js';
 import type {
   CreateGitHubOrganizationRequest,
   UpdateGitHubOrganizationRequest,

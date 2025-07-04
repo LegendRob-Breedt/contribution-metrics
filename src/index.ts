@@ -1,10 +1,14 @@
 import 'reflect-metadata';
 import Fastify from 'fastify';
-import { config } from './config/index.js';
-import { createAppDataSource } from './database/index.js';
-import zodOpenApiPlugin from './plugins/zod-openapi.js';
-import { initializeTracing, shutdownTracing } from './tracing.js';
-import { githubOrganizationRoutes, userRoutes, githubContributorRoutes } from './routes/index.js';
+import { config } from './shared/config/index.js';
+import { createAppDataSource } from './shared/database/index.js';
+import zodOpenApiPlugin from './shared/plugins/zod-openapi.js';
+import { initializeTracing, shutdownTracing } from './shared/instrumentation/tracing.js';
+import { initializeMetrics, shutdownMetrics } from './shared/instrumentation/metrics.js';
+import { createAppContainer } from './shared/container/index.js';
+import { githubOrganizationRoutes } from './modules/github-organization/routes/github-organization.routes.js';
+import { userRoutes } from './modules/user/routes/user.routes.js';
+import { githubContributorRoutes } from './modules/github-contributor/routes/github-contributor.routes.js';
 import packackInfo from '../package.json' with { type: 'json' };
 import type { JSONObject } from '@fastify/swagger';
 import type { DataSource } from 'typeorm';
@@ -20,6 +24,12 @@ async function startApplication() {
     appConfig.OTEL_SERVICE_NAME || 'contribution-metrics',
     appConfig.OTEL_SERVICE_VERSION || '1.0.0',
     appConfig.OTEL_EXPORTER_OTLP_ENDPOINT
+  );
+
+  // Initialize OpenTelemetry metrics
+  initializeMetrics(
+    appConfig.OTEL_SERVICE_NAME || 'contribution-metrics',
+    appConfig.OTEL_SERVICE_VERSION || '1.0.0'
   );
 
   const fastify = Fastify({
@@ -55,10 +65,13 @@ async function startApplication() {
     // Don't exit the process - let the server run without database for now
   }
 
-  // Register API routes with dataSource
-  await fastify.register(githubOrganizationRoutes, { dataSource: appDataSource });
-  await fastify.register(userRoutes);
-  await fastify.register(githubContributorRoutes);
+  // Register API routes with container
+  if (appDataSource?.isInitialized) {
+    const container = createAppContainer(appDataSource);
+    await fastify.register(githubOrganizationRoutes, { container });
+    await fastify.register(userRoutes, { container });
+    await fastify.register(githubContributorRoutes, { container });
+  }
 
   // Health check endpoint
   fastify.get('/health', async () => {
@@ -91,6 +104,7 @@ async function startApplication() {
     if (appDataSource) {
       await appDataSource.destroy();
     }
+    await shutdownMetrics();
     await shutdownTracing(sdk);
     process.exit(0);
   });
@@ -101,6 +115,7 @@ async function startApplication() {
     if (appDataSource) {
       await appDataSource.destroy();
     }
+    await shutdownMetrics();
     await shutdownTracing(sdk);
     process.exit(0);
   });

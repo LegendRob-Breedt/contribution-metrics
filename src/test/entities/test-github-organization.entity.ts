@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { Entity, Column } from 'typeorm';
-import { BaseEntity } from '../../entities/base.entity.js';
+import { BaseEntity } from '../../adaptors/db/shared/entities/base.entity.js';
 
 // Test-specific entity that mirrors the main GitHubOrganization
 // but uses datetime for SQLite compatibility in tests
