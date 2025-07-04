@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { DataSource } from 'typeorm';
 import { TestGitHubOrganization } from '../entities/test-github-organization.entity.js';
-import { isValidUUID } from '../../entities/base.entity.js';
+import { isValidUUID } from '../../adaptors/db/shared/entities/base.entity.js';
 
 describe('BaseEntity UUID Generation', () => {
   let dataSource: DataSource;

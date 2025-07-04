@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import Fastify from 'fastify';
-import { config } from '../../config/index.js';
-import { initializeTracing } from '../../tracing.js';
+import { config } from '../../shared/config/index.js';
+import { initializeTracing } from '../../shared/instrumentation/tracing.js';
 
 // Simple test to verify basic startup
 async function testStartup() {
