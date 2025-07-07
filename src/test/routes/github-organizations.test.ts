@@ -5,28 +5,17 @@ import { DataSource } from 'typeorm';
 import { githubOrganizationRoutes } from '../../modules/github-organization/routes/github-organization.routes.js';
 import { GitHubOrganizationEntity } from '../../adaptors/db/github-organization/entities/github-organization.entity.js';
 import { GitHubOrganizationRepositoryImpl } from '../../adaptors/db/github-organization/repositories/github-organization.repository.js';
-import { TestGitHubOrganization } from '../entities/test-github-organization.entity.js';
 import { GitHubOrganizationServiceImpl } from '../../modules/github-organization/application/github-organization.service.js';
 import zodOpenApiPlugin from '../../shared/plugins/zod-openapi.js';
+import { createTestDataSource, cleanupTestDataSource, clearTestData } from '../utils/test-database.js';
 
 describe('GitHub Organizations Routes Integration', () => {
   let app: FastifyInstance;
   let dataSource: DataSource;
 
   beforeAll(async () => {
-    // Create in-memory database for testing
-    // Using SQLite with the test entity that has datetime type compatibility  
-    dataSource = new DataSource({
-      type: 'sqlite',
-      database: ':memory:',
-      entities: [TestGitHubOrganization],
-      synchronize: true,
-      logging: false,
-      // Enable UUID extension for SQLite
-      enableWAL: false,
-    });
-
-    await dataSource.initialize();
+    // Create in-memory PostgreSQL database for testing using pg-mem
+    dataSource = await createTestDataSource();
 
     // Create Fastify app
     app = Fastify({
@@ -36,10 +25,10 @@ describe('GitHub Organizations Routes Integration', () => {
     // Register plugins
     await app.register(zodOpenApiPlugin);
     
-    // Create a custom route handler that uses the test entity
+    // Create a custom route handler that uses the actual GitHubOrganizationEntity
     await app.register(async function (fastify) {
       const tags = ['GitHub Organizations'];
-      const typeormRepository = dataSource.getRepository(TestGitHubOrganization);
+      const typeormRepository = dataSource.getRepository(GitHubOrganizationEntity);
       const repository = new GitHubOrganizationRepositoryImpl(typeormRepository as any);
       const service = new GitHubOrganizationServiceImpl(repository);
 
@@ -153,13 +142,12 @@ describe('GitHub Organizations Routes Integration', () => {
 
   afterAll(async () => {
     await app.close();
-    await dataSource.destroy();
+    await cleanupTestDataSource(dataSource);
   });
 
   beforeEach(async () => {
-    // Clean database before each test
-    const repository = dataSource.getRepository(TestGitHubOrganization);
-    await repository.clear();
+    // Clear data for each test to avoid conflicts
+    await clearTestData(dataSource);
   });
 
   describe('POST /api/github-organizations', () => {
@@ -260,22 +248,32 @@ describe('GitHub Organizations Routes Integration', () => {
     });
 
     it('should return all organizations', async () => {
-      // Create test data
-      const repository = dataSource.getRepository(TestGitHubOrganization);
-      
-      const org1 = repository.create({
-        name: 'ORG-ONE',
+      // Create test data using the service instead of direct repository access
+      // to ensure proper UUID generation
+      const payload1 = {
+        name: 'org-one',
         accessToken: 'token1',
-        tokenExpiresAt: new Date('2025-12-31T23:59:59Z'),
+        tokenExpiresAt: '2025-12-31T23:59:59Z',
+      };
+      
+      const payload2 = {
+        name: 'org-two',
+        accessToken: 'token2',
+        tokenExpiresAt: '2025-12-31T23:59:59Z',
+      };
+
+      // Use the API to create organizations to avoid UUID issues
+      await app.inject({
+        method: 'POST',
+        url: '/api/github-organizations',
+        payload: payload1,
       });
       
-      const org2 = repository.create({
-        name: 'ORG-TWO',
-        accessToken: 'token2',
-        tokenExpiresAt: new Date('2025-12-31T23:59:59Z'),
+      await app.inject({
+        method: 'POST',
+        url: '/api/github-organizations',
+        payload: payload2,
       });
-
-      await repository.save([org1, org2]);
 
       const response = await app.inject({
         method: 'GET',
@@ -298,7 +296,7 @@ describe('GitHub Organizations Routes Integration', () => {
   describe('GET /api/github-organizations/:id', () => {
     it('should return organization by id', async () => {
       // Create test data
-      const repository = dataSource.getRepository(TestGitHubOrganization);
+      const repository = dataSource.getRepository(GitHubOrganizationEntity);
       const org = repository.create({
         name: 'TEST-ORG',
         accessToken: 'token123',
@@ -342,17 +340,15 @@ describe('GitHub Organizations Routes Integration', () => {
         url: '/api/github-organizations/invalid-uuid',
       });
 
-      // Since we don't have UUID validation at the route level in our simple setup,
-      // this will return 404 instead of 400. In a full implementation with proper
-      // schema validation, this would return 400.
-      expect(response.statusCode).toBe(404);
+      // The service validates UUIDs and returns 400 for invalid format
+      expect(response.statusCode).toBe(400);
     });
   });
 
   describe('PUT /api/github-organizations/:id', () => {
     it('should update organization', async () => {
       // Create test data
-      const repository = dataSource.getRepository(TestGitHubOrganization);
+      const repository = dataSource.getRepository(GitHubOrganizationEntity);
       const org = repository.create({
         name: 'OLD-ORG',
         accessToken: 'token123',
@@ -386,7 +382,7 @@ describe('GitHub Organizations Routes Integration', () => {
 
     it('should handle partial updates', async () => {
       // Create test data
-      const repository = dataSource.getRepository(TestGitHubOrganization);
+      const repository = dataSource.getRepository(GitHubOrganizationEntity);
       const org = repository.create({
         name: 'EXISTING-ORG',
         accessToken: 'token123',
@@ -426,7 +422,7 @@ describe('GitHub Organizations Routes Integration', () => {
   describe('DELETE /api/github-organizations/:id', () => {
     it('should delete organization', async () => {
       // Create test data
-      const repository = dataSource.getRepository(TestGitHubOrganization);
+      const repository = dataSource.getRepository(GitHubOrganizationEntity);
       const org = repository.create({
         name: 'TO-DELETE',
         accessToken: 'token123',

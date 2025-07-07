@@ -1,5 +1,5 @@
 import { Entity, Column } from 'typeorm';
-import { BaseEntity } from '../../../shared/entities/base.entity.js';
+import { BaseEntity } from '../../db/shared/entities/base.entity.js';
 
 @Entity('github_organizations')
 export class GitHubOrganizationEntity extends BaseEntity {

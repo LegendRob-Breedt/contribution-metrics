@@ -159,3 +159,13 @@ When a service integrates with external APIs (like GitHub) or OAuth, it should:
 - Use volumes for persistent data storage
 - Use environment variables for configuration
 - Ensure all services can be started with `docker-compose up`
+
+# Copilot Instructions
+- Track changes made by the AI in a change log file by chat session.
+  - Create new changelog files in `docs/changelogs/` directory
+  - Use filename format: `YYYY-MM-DD_session-description.md`
+  - Update the `docs/changelogs/README.md` index with new session entries
+  - Document all file modifications, creations, and deletions
+  - Include commands executed and verification steps
+  - Mark completion status for major changes
+  - Use the template provided in the changelogs README for consistency

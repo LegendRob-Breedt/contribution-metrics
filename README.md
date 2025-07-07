@@ -16,7 +16,7 @@ A Node.js service for tracking GitHub contribution metrics, managing user data, 
 
 - **Runtime**: Node.js 22
 - **Language**: TypeScript (ES2022)
-- **Package Manager**: PNPM
+- **Package Manager**: NPM
 - **Web Framework**: Fastify
 - **API Documentation**: OpenAPI v3 with Swagger UI
 - **Schema Validation**: Zod with fastify-zod-openapi
@@ -34,7 +34,7 @@ A Node.js service for tracking GitHub contribution metrics, managing user data, 
 ### Prerequisites
 
 - Node.js 22+
-- PNPM 9+
+- NPM 10+
 - Docker & Docker Compose
 
 ### Installation
@@ -47,7 +47,7 @@ A Node.js service for tracking GitHub contribution metrics, managing user data, 
 
 2. **Install dependencies**
    ```bash
-   pnpm install
+   npm install
    ```
 
 3. **Set up environment**
@@ -58,17 +58,17 @@ A Node.js service for tracking GitHub contribution metrics, managing user data, 
 
 4. **Start local development services**
    ```bash
-   pnpm docker:up
+   npm run docker:up
    ```
 
 5. **Run database migrations**
    ```bash
-   pnpm db:migrate
+   npm run db:migrate
    ```
 
 6. **Start the development server**
    ```bash
-   pnpm dev
+   npm run dev
    ```
 
 The API will be available at `http://localhost:3000` with documentation at `http://localhost:3000/documentation`.
@@ -136,28 +136,28 @@ Link GitHub identities to internal users:
 
 ```bash
 # Development
-pnpm dev              # Start development server with hot reload
-pnpm build            # Build TypeScript to JavaScript
-pnpm start            # Start production server
+npm run dev              # Start development server with hot reload
+npm run build            # Build TypeScript to JavaScript
+npm run start            # Start production server
 
 # Testing
-pnpm test             # Run tests
-pnpm test:coverage    # Run tests with coverage report
+npm run test             # Run tests
+npm run test:coverage    # Run tests with coverage report
 
 # Code Quality
-pnpm lint             # Run ESLint
-pnpm lint:fix         # Fix ESLint issues
-pnpm format           # Format code with Prettier
-pnpm typecheck        # Type check without building
+npm run lint             # Run ESLint
+npm run lint:fix         # Fix ESLint issues
+npm run format           # Format code with Prettier
+npm run typecheck        # Type check without building
 
 # Database
-pnpm db:migrate       # Run database migrations
-pnpm db:revert        # Revert last migration
-pnpm db:generate      # Generate new migration
+npm run db:migrate       # Run database migrations
+npm run db:revert        # Revert last migration
+npm run db:generate      # Generate new migration
 
 # Docker
-pnpm docker:up        # Start development services
-pnpm docker:down      # Stop development services
+npm run docker:up        # Start development services
+npm run docker:down      # Stop development services
 ```
 
 ### Project Structure
@@ -207,13 +207,13 @@ The project uses Vitest for testing with coverage reporting:
 
 ```bash
 # Run all tests
-pnpm test
+npm test
 
 # Run tests in watch mode
-pnpm test --watch
+npm test -- --watch
 
 # Generate coverage report
-pnpm test:coverage
+npm run test:coverage
 ```
 
 ### Code Quality
@@ -237,6 +237,18 @@ The `docker-compose.yml` provides:
 - **PostgreSQL**: Main database (port 5432)
 - **Redis**: Caching and session storage (port 6379)
 - **Jaeger**: Distributed tracing UI (port 16686)
+
+## Documentation
+
+For detailed information about the project, see the following documentation:
+
+- **[Architecture Implementation](docs/ARCHITECTURE_IMPLEMENTATION.md)**: Detailed architectural design and implementation patterns
+- **[Metrics Implementation](docs/METRICS_IMPLEMENTATION.md)**: Comprehensive guide to metrics collection and monitoring
+- **[Testing Summary](docs/TESTING_SUMMARY.md)**: Testing strategies, patterns, and test suite overview
+- **[PG_MEM Implementation](docs/PG_MEM_IMPLEMENTATION.md)**: In-memory PostgreSQL testing setup and usage
+- **[PG_MEM Status](docs/PG_MEM_STATUS.md)**: Current status and considerations for PG_MEM integration
+- **[Prompt Generation](docs/PROMPT-GENERATION.md)**: Development prompts and code generation guidelines
+- **[AI Changelogs](docs/changelogs/README.md)**: Track of changes made by AI assistants during development sessions
 
 ## Contributing
 

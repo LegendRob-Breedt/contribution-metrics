@@ -3,7 +3,7 @@ import { Entity, Column } from 'typeorm';
 import { BaseEntity } from '../../adaptors/db/shared/entities/base.entity.js';
 
 // Test-specific entity that mirrors the main GitHubOrganization
-// but uses datetime for SQLite compatibility in tests
+// Updated to use PostgreSQL-compatible types with pg-mem
 @Entity('github_organizations')
 export class TestGitHubOrganization extends BaseEntity {
   @Column({ type: 'varchar', unique: true })
@@ -12,6 +12,6 @@ export class TestGitHubOrganization extends BaseEntity {
   @Column({ type: 'text' })
   accessToken!: string;
 
-  @Column({ type: 'datetime' }) // Use datetime for SQLite compatibility in tests
+  @Column({ type: 'timestamp' }) // Use timestamp for PostgreSQL compatibility
   tokenExpiresAt!: Date;
 }
