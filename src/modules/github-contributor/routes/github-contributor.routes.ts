@@ -149,9 +149,9 @@ export async function githubContributorRoutes(
         currentEmail,
         currentName,
         userId,
-        historicalUsernames = [],
-        historicalEmails = [],
-        historicalNames = [],
+        allKnownUsernames = [],
+        allKnownEmails = [],
+        allKnownNames = [],
       } = request.body;
 
       try {
@@ -161,9 +161,9 @@ export async function githubContributorRoutes(
           currentEmail,
           currentName,
           userId,
-          historicalUsernames,
-          historicalEmails,
-          historicalNames
+          allKnownUsernames,
+          allKnownEmails,
+          allKnownNames
         );
 
         const result = await service.create(contributor);

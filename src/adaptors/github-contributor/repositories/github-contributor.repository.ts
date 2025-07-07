@@ -86,11 +86,11 @@ export class GitHubContributorRepositoryImpl implements GitHubContributorReposit
 
   async findByAnyUsername(username: string): Promise<Result<GitHubContributor[], DatabaseError>> {
     try {
-      // Find by current username or historical usernames
+      // Find by current username or all known usernames
       const entities = await this.repository
         .createQueryBuilder('contributor')
         .where('contributor.current_username = :username', { username })
-        .orWhere(':username = ANY(contributor.historical_usernames)', { username })
+        .orWhere(':username = ANY(contributor.all_known_usernames)', { username })
         .getMany();
 
       const contributors = entities.map(entity => this.entityToDomain(entity));
@@ -104,11 +104,11 @@ export class GitHubContributorRepositoryImpl implements GitHubContributorReposit
 
   async findByAnyEmail(email: string): Promise<Result<GitHubContributor[], DatabaseError>> {
     try {
-      // Find by current email or historical emails
+      // Find by current email or all known emails
       const entities = await this.repository
         .createQueryBuilder('contributor')
         .where('contributor.current_email = :email', { email })
-        .orWhere(':email = ANY(contributor.historical_emails)', { email })
+        .orWhere(':email = ANY(contributor.all_known_emails)', { email })
         .getMany();
 
       const contributors = entities.map(entity => this.entityToDomain(entity));
@@ -135,11 +135,14 @@ export class GitHubContributorRepositoryImpl implements GitHubContributorReposit
       if (updates.currentUsername) updatedEntity.currentUsername = updates.currentUsername;
       if (updates.currentEmail) updatedEntity.currentEmail = updates.currentEmail;
       if (updates.currentName) updatedEntity.currentName = updates.currentName;
-      if (updates.historicalUsernames)
-        updatedEntity.historicalUsernames = [...updates.historicalUsernames];
-      if (updates.historicalEmails) updatedEntity.historicalEmails = [...updates.historicalEmails];
-      if (updates.historicalNames) updatedEntity.historicalNames = [...updates.historicalNames];
-      if (updates.userId) updatedEntity.userId = updates.userId;
+      if (updates.allKnownUsernames)
+        updatedEntity.allKnownUsernames = [...updates.allKnownUsernames];
+      if (updates.allKnownEmails) updatedEntity.allKnownEmails = [...updates.allKnownEmails];
+      if (updates.allKnownNames) updatedEntity.allKnownNames = [...updates.allKnownNames];
+      if (updates.userId !== undefined) updatedEntity.userId = updates.userId || undefined;
+      if (updates.lastActiveDate !== undefined) 
+        updatedEntity.lastActiveDate = updates.lastActiveDate || undefined;
+      if (updates.status) updatedEntity.status = updates.status;
 
       updatedEntity.updatedAt = new Date();
 
@@ -168,10 +171,12 @@ export class GitHubContributorRepositoryImpl implements GitHubContributorReposit
     entity.currentUsername = contributor.currentUsername;
     entity.currentEmail = contributor.currentEmail;
     entity.currentName = contributor.currentName;
-    entity.historicalUsernames = [...contributor.historicalUsernames];
-    entity.historicalEmails = [...contributor.historicalEmails];
-    entity.historicalNames = [...contributor.historicalNames];
-    entity.userId = contributor.userId;
+    entity.allKnownUsernames = [...contributor.allKnownUsernames];
+    entity.allKnownEmails = [...contributor.allKnownEmails];
+    entity.allKnownNames = [...contributor.allKnownNames];
+    entity.userId = contributor.userId || undefined;
+    entity.lastActiveDate = contributor.lastActiveDate || undefined;
+    entity.status = contributor.status;
     entity.createdAt = contributor.createdAt;
     entity.updatedAt = contributor.updatedAt;
     return entity;
@@ -183,10 +188,12 @@ export class GitHubContributorRepositoryImpl implements GitHubContributorReposit
       entity.currentUsername,
       entity.currentEmail,
       entity.currentName,
-      entity.historicalUsernames || [],
-      entity.historicalEmails || [],
-      entity.historicalNames || [],
-      entity.userId,
+      entity.allKnownUsernames || [],
+      entity.allKnownEmails || [],
+      entity.allKnownNames || [],
+      entity.userId || null,
+      entity.lastActiveDate || null,
+      entity.status,
       entity.createdAt,
       entity.updatedAt
     );

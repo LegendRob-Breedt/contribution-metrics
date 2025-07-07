@@ -14,6 +14,9 @@ This directory contains individual changelog files for each AI chat session to m
 - **[2025-07-04_changelog-system-enhancement.md](2025-07-04_changelog-system-enhancement.md)**: Enhanced changelog system with datetime-based file organization
 - **[2025-07-04_base-entity-uuid-fix.md](2025-07-04_base-entity-uuid-fix.md)**: Fixed BaseEntity UUID generation issue for reliable testing
 
+### 2025-07-07  
+- **[2025-07-07_github-contributor-entity-enhancement.md](2025-07-07_github-contributor-entity-enhancement.md)**: Complete GitHub Contributor entity refactoring with new field names, nullable userId, schema updates, and routes fixes
+
 ---
 
 ## Template for New Sessions
