@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { BaseEntity } from '../../../shared/entities/base.entity.js';
+import { BaseEntity } from '../../db/shared/entities/base.entity.js';
 
 export enum Role {
   PRODUCT_ENGINEER = 'Product Engineer',

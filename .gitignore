@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-pnpm-lock.yaml
+package-lock.json
 
 # Build outputs
 dist/
@@ -15,7 +15,8 @@ build/
 logs/
 *.log
 npm-debug.log*
-pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Coverage directory used by tools like istanbul
 coverage/
