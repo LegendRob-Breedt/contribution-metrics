@@ -2,6 +2,7 @@
 applyTo: '**'
 ---
 Coding standards, domain knowledge, and preferences that AI should follow.
+When implementing changes only do what I ask. You can suggest additional changes with YES, NO, REMEMBER FOR LATER IMPLEMENATION options.
 
 # Contribution Metrics Service - Copilot Instructions
 

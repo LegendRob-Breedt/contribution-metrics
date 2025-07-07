@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from 'zod-openapi';
+import { GitHubContributorStatus } from '../domains/github-contributor.domain.js';
 
 extendZodWithOpenApi(z);
 
@@ -21,25 +22,34 @@ export const GitHubContributorSchema = z
       .min(1)
       .max(255)
       .openapi({ example: 'John Doe', description: 'Current display name' }),
-    historicalUsernames: z
+    allKnownUsernames: z
       .array(z.string())
       .default([])
       .openapi({
         example: ['oldusername', 'previousname'],
-        description: 'List of historical usernames',
+        description: 'List of all known usernames',
       }),
-    historicalEmails: z
+    allKnownEmails: z
       .array(z.string().email())
       .default([])
       .openapi({
         example: ['old@example.com', 'previous@example.com'],
-        description: 'List of historical emails',
+        description: 'List of all known emails',
       }),
-    historicalNames: z
+    allKnownNames: z
       .array(z.string())
       .default([])
-      .openapi({ example: ['Old Name', 'Previous Name'], description: 'List of historical names' }),
-    userId: z.string().uuid().openapi({ example: '456e7890-e89b-12d3-a456-426614174000' }),
+      .openapi({ example: ['Old Name', 'Previous Name'], description: 'List of all known names' }),
+    userId: z
+      .string()
+      .uuid()
+      .nullable()
+      .openapi({ example: '456e7890-e89b-12d3-a456-426614174000' }),
+    lastActiveDate: z.date().nullable().openapi({ example: '2023-01-01T00:00:00.000Z' }),
+    status: z
+      .nativeEnum(GitHubContributorStatus)
+      .default(GitHubContributorStatus.ACTIVE)
+      .openapi({ example: GitHubContributorStatus.ACTIVE }),
     createdAt: z.date().openapi({ example: '2023-01-01T00:00:00.000Z' }),
     updatedAt: z.date().openapi({ example: '2023-01-01T00:00:00.000Z' }),
   })
