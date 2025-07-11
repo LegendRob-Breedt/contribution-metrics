@@ -1,7 +1,4 @@
-export enum GitHubContributorStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-}
+import { ActiveStatus } from '../../../shared/entities/index.js';
 
 export class GitHubContributor {
   constructor(
@@ -14,7 +11,7 @@ export class GitHubContributor {
     public readonly allKnownNames: readonly string[],
     public readonly userId: string | null,
     public readonly lastActiveDate: Date | null,
-    public readonly status: GitHubContributorStatus,
+    public readonly status: ActiveStatus,
     public readonly createdAt: Date,
     public readonly updatedAt: Date
   ) {}
@@ -29,7 +26,7 @@ export class GitHubContributor {
     allKnownEmails: string[] = [],
     allKnownNames: string[] = [],
     lastActiveDate: Date | null = null,
-    status: GitHubContributorStatus = GitHubContributorStatus.ACTIVE,
+    status: ActiveStatus = ActiveStatus.ACTIVE,
     createdAt = new Date(),
     updatedAt = new Date()
   ): GitHubContributor {
@@ -65,9 +62,7 @@ export class GitHubContributor {
     );
 
     const cleanAllKnownEmails = Array.from(
-      new Set(
-        allKnownEmails.filter(email => email.trim()).map(email => email.toLowerCase().trim())
-      )
+      new Set(allKnownEmails.filter(email => email.trim()).map(email => email.toLowerCase().trim()))
     );
 
     const cleanAllKnownNames = Array.from(
@@ -190,7 +185,7 @@ export class GitHubContributor {
     );
   }
 
-  public updateStatus(status: GitHubContributorStatus): GitHubContributor {
+  public updateStatus(status: ActiveStatus): GitHubContributor {
     return new GitHubContributor(
       this.id,
       this.currentUsername,

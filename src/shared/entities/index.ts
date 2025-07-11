@@ -1,4 +1,4 @@
-export { BaseEntity } from '../../adaptors/db/shared/entities/base.entity.js';
+export { BaseEntity, ActiveStatus } from '../../adaptors/db/shared/entities/base.entity.js';
 // GitHubOrganization entity moved to adaptors/github-organization/entities
 export {
   UserEntity as User,

@@ -1,4 +1,10 @@
-import { CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, Column } from 'typeorm';
+
+export enum ActiveStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PENDING = 'pending',
+}
 
 /**
  * Base entity class that provides common fields for all entities.
@@ -13,4 +19,12 @@ export abstract class BaseEntity {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @Column({
+    type: 'enum',
+    enum: ActiveStatus,
+    default: ActiveStatus.ACTIVE,
+    name: 'active_status',
+  })
+  activeStatus!: ActiveStatus;
 }

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from 'zod-openapi';
-import { GitHubContributorStatus } from '../domains/github-contributor.domain.js';
+import { ActiveStatus } from '../../../shared/entities/index.js';
 
 extendZodWithOpenApi(z);
 
@@ -47,9 +47,9 @@ export const GitHubContributorSchema = z
       .openapi({ example: '456e7890-e89b-12d3-a456-426614174000' }),
     lastActiveDate: z.date().nullable().openapi({ example: '2023-01-01T00:00:00.000Z' }),
     status: z
-      .nativeEnum(GitHubContributorStatus)
-      .default(GitHubContributorStatus.ACTIVE)
-      .openapi({ example: GitHubContributorStatus.ACTIVE }),
+      .nativeEnum(ActiveStatus)
+      .default(ActiveStatus.ACTIVE)
+      .openapi({ example: ActiveStatus.ACTIVE }),
     createdAt: z.date().openapi({ example: '2023-01-01T00:00:00.000Z' }),
     updatedAt: z.date().openapi({ example: '2023-01-01T00:00:00.000Z' }),
   })

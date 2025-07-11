@@ -17,6 +17,13 @@ This directory contains individual changelog files for each AI chat session to m
 ### 2025-07-07  
 - **[2025-07-07_github-contributor-entity-enhancement.md](2025-07-07_github-contributor-entity-enhancement.md)**: Complete GitHub Contributor entity refactoring with new field names, nullable userId, schema updates, and routes fixes
 
+### 2025-01-11
+- **[2025-01-11_tempo-migration-instructions.md](2025-01-11_tempo-migration-instructions.md)**: Updated Copilot instructions to migrate from Jaeger to Grafana Tempo for distributed tracing
+- **[2025-01-11_prometheus-otlp-remote-write.md](2025-01-11_prometheus-otlp-remote-write.md)**: Enhanced Prometheus instructions to use OTLP remote write for metrics ingestion
+- **[2025-01-11_grafana-dashboard-management.md](2025-01-11_grafana-dashboard-management.md)**: Added comprehensive Grafana dashboard creation and maintenance instructions
+- **[2025-01-11_copilot-instructions-comprehensive-review.md](2025-01-11_copilot-instructions-comprehensive-review.md)**: Comprehensive review and enhancement of Copilot instructions with corrections, new sections, and best practices
+- **[2025-01-11_base-entity-active-status-refactoring.md](2025-01-11_base-entity-active-status-refactoring.md)**: Refactored GitHub Contributor entity system to use standardized ActiveStatus enum from BaseEntity
+
 ---
 
 ## Template for New Sessions

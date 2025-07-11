@@ -140,9 +140,9 @@ export class GitHubContributorRepositoryImpl implements GitHubContributorReposit
       if (updates.allKnownEmails) updatedEntity.allKnownEmails = [...updates.allKnownEmails];
       if (updates.allKnownNames) updatedEntity.allKnownNames = [...updates.allKnownNames];
       if (updates.userId !== undefined) updatedEntity.userId = updates.userId || undefined;
-      if (updates.lastActiveDate !== undefined) 
+      if (updates.lastActiveDate !== undefined)
         updatedEntity.lastActiveDate = updates.lastActiveDate || undefined;
-      if (updates.status) updatedEntity.status = updates.status;
+      if (updates.status) updatedEntity.activeStatus = updates.status;
 
       updatedEntity.updatedAt = new Date();
 
@@ -176,7 +176,7 @@ export class GitHubContributorRepositoryImpl implements GitHubContributorReposit
     entity.allKnownNames = [...contributor.allKnownNames];
     entity.userId = contributor.userId || undefined;
     entity.lastActiveDate = contributor.lastActiveDate || undefined;
-    entity.status = contributor.status;
+    entity.activeStatus = contributor.status;
     entity.createdAt = contributor.createdAt;
     entity.updatedAt = contributor.updatedAt;
     return entity;
@@ -193,7 +193,7 @@ export class GitHubContributorRepositoryImpl implements GitHubContributorReposit
       entity.allKnownNames || [],
       entity.userId || null,
       entity.lastActiveDate || null,
-      entity.status,
+      entity.activeStatus,
       entity.createdAt,
       entity.updatedAt
     );
